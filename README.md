@@ -2,11 +2,16 @@
 
 &copy; 2020, [Mike Tigas](https://mike.tig.as/); [MPL-2.0 License](LICENSE.txt)
 
-A tiny utility for _super cheap_ BLE tire pressure/temperature sensors available on the internet. Most of these products do have their own apps (i.e. [this one](https://apps.apple.com/us/app/tpmsii/id1436006976)) which don't have features beyond displaying the values (in various units) and providing bounds alerts (for low air pressure, etc) while the app is open.
+A tiny utility for _super cheap_ BLE tire pressure/temperature sensors available on the internet. Most of these products do have their own apps (i.e. [this one](https://apps.apple.com/us/app/tpmsii/id1436006976)) which don't have features beyond displaying the values (in various units) and providing bounds alerts (for low air pressure, etc) while the app is open. See [Device Details](#device-details) below for example devices & where to buy them.
 
 I wanted something to use alongside [RaceChrono](https://racechrono.com/) which I am currently using as a data logger with dash cam footage, particularly when [putting together video from autocross and similar events](https://www.youtube.com/playlist?list=PLRa9P6UDYxmqmdjMVgHUMYNy2yOgHtS_r) in [RaceRender](http://racerender.com/Products/index.html):
 
 [![Example video render of a car on an autocross track, with a cone obstacle course, and an overlay of car data including speed and RPM](https://github.com/mtigas/iOS-BLE-Tire-Logger/blob/main/doc/screenshot-video.jpg?raw=true)](https://www.youtube.com/watch?v=oGNmTjFpWAI&list=PLRa9P6UDYxmqmdjMVgHUMYNy2yOgHtS_r&index=2)
+
+**Notes**:
+* I threw this together really quickly (literally over a weekend) so everything is still very rough. It's very much just a minimum viable thing that's usable for my own purposes (like that above video).
+* It has not been submitted to the App Store, though I may do so in the future, once there are fewer things hard-coded and once there are a few more UI bits in here.
+* I'm currently running iOS betas and using the current Xcode 12 Beta (for iOS 14, etc). So apologies if this does not build cleanly on other versions yet.
 
 ---
 
