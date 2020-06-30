@@ -16,7 +16,34 @@ struct ContentView: View {
     @ObservedObject var dataManager: DataDelegate
     
     var body: some View {
-        Text(dataManager.screenText).padding()
+        let dataFont:Font = Font.system(size: 32, weight: .bold, design: .monospaced)
+        let timeFont:Font = Font.headline.monospacedDigit()
+        return (
+        Text(dataManager.screenText)
+            + (Text(dataManager.screenTire1Pres+"\t\t").font(dataFont) as Text)
+            + (Text("psi").font(timeFont) as Text)
+            + (Text("\t\t\t"+dataManager.screenTire2Pres).font(dataFont) as Text)
+            + (Text("\n") as Text)
+            + (Text(dataManager.screenTire1Temp+"\t\t").font(dataFont) as Text)
+            + (Text("ºF").font(timeFont) as Text)
+            + (Text("\t\t\t"+dataManager.screenTire2Temp).font(dataFont) as Text)
+            + (Text("\n") as Text)
+            + (Text(dataManager.screenTire1Time+"\t\t\t\t").font((timeFont)) as Text)
+            + (Text("sec").font(timeFont) as Text)
+            + (Text("\t\t\t"+dataManager.screenTire2Time).font(timeFont) as Text)
+            + (Text("\n\n\n") as Text)
+            + (Text(dataManager.screenTire3Pres+"\t\t").font(dataFont) as Text)
+            + (Text("psi").font(timeFont) as Text)
+            + (Text("\t\t\t"+dataManager.screenTire4Pres).font(dataFont) as Text)
+            + (Text("\n") as Text)
+            + (Text(dataManager.screenTire3Temp+"\t\t").font(dataFont) as Text)
+            + (Text("ºF").font(timeFont) as Text)
+            + (Text("\t\t\t"+dataManager.screenTire4Temp).font(dataFont) as Text)
+            + (Text("\n") as Text)
+            + (Text(dataManager.screenTire3Time+"\t\t\t\t").font((timeFont)) as Text)
+            + (Text("sec").font(timeFont) as Text)
+            + (Text("\t\t\t"+dataManager.screenTire4Time).font(timeFont) as Text)
+        )
     }
 }
 

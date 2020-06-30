@@ -1,16 +1,12 @@
 # iOS TPMS Data Logger (for BLE tire pressure sensors, inc. "TP630", "ZEEPIN", etc)
 
-&copy; 2020, [Mike Tigas](https://mike.tig.as/)  
-Please see the [LICENSE.txt](LICENSE.txt) file for usage and redistribution terms.
-
----
+&copy; 2020, [Mike Tigas](https://mike.tig.as/); [MPL-2.0 License](LICENSE.txt)
 
 A tiny utility for _super cheap_ BLE tire pressure/temperature sensors available on the internet. Most of these products do have their own apps (i.e. [this one](https://apps.apple.com/us/app/tpmsii/id1436006976)) which don't have features beyond displaying the values (in various units) and providing bounds alerts (for low air pressure, etc) while the app is open.
 
-I wanted something to use alongside [RaceChrono](https://racechrono.com/) which I am currently using as a data logger with dash cam footage, particularly when [putting together video from autocross and similar events](https://www.youtube.com/playlist?list=PLRa9P6UDYxmqmdjMVgHUMYNy2yOgHtS_r) in [RaceRender](http://racerender.com/Products/index.html).
+I wanted something to use alongside [RaceChrono](https://racechrono.com/) which I am currently using as a data logger with dash cam footage, particularly when [putting together video from autocross and similar events](https://www.youtube.com/playlist?list=PLRa9P6UDYxmqmdjMVgHUMYNy2yOgHtS_r) in [RaceRender](http://racerender.com/Products/index.html):
 
-[![Example video render of a car on an autocross track, with a cone obstacle course, and an overlay of car data including speed and RPM](https://github.com/mtigas/ios-ble-tpms-logger/blob/main/doc/screenshot-video.jpg?raw=true)](https://www.youtube.com/watch?v=rZGtBeNl4KU&list=PLRa9P6UDYxmqmdjMVgHUMYNy2yOgHtS_r&index=2)  
-(TODO: screenshot of video that actually uses the tire data collected by this utility)
+[![Example video render of a car on an autocross track, with a cone obstacle course, and an overlay of car data including speed and RPM](https://github.com/mtigas/ios-ble-tpms-logger/blob/main/doc/screenshot-video.jpg?raw=true)](https://www.youtube.com/watch?v=oGNmTjFpWAI&list=PLRa9P6UDYxmqmdjMVgHUMYNy2yOgHtS_r&index=2)
 
 ---
 
@@ -20,7 +16,7 @@ Any sensor starting with `TPMS1_` is assumed to be the front-left tire, `TPMS2_`
 
 Data is saved as a CSV to the app's `documentDirectory`, and is accessible in the iOS Files app or in the Files section of the iOS device sync screen of MacOS: `On My iPhone/BLE Tire Logger/data-YYY-MM-DDTHHMMSS.csv`
 
-See [doc/example-2020-06-24T234645.csv](doc/example-2020-06-24T234645.csv).
+See [doc/EXAMPLE-data-2020-06-28T103840.csv](doc/EXAMPLE-data-2020-06-28T103840.csv), which is an export from the autocross event in the above video.
 
 ![Example CSV output](https://github.com/mtigas/ios-ble-tpms-logger/blob/main/doc/screenshot-csv.png?raw=true)
 

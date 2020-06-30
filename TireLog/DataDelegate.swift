@@ -37,12 +37,33 @@ extension Data {
     }
 }
 
+let csvHeader:String = "timestamp," +
+    "lat,lon,latlon_acc_m,latlon_acc_ft," +
+    "elevation_m,elevation_acc_m,elevation_ft,elevation_acc_ft," +
+    "speed_mps,speed_acc_mps,speed_mph,speed_acc_mph," +
+    "have_tire," +
+    "tire_fl_kpa,tire_fl_psi,tire_fl_c,tire_fl_f," +
+    "tire_fr_kpa,tire_fr_psi,tire_fr_c,tire_fr_f," +
+    "tire_rl_kpa,tire_rl_psi,tire_rl_c,tire_rl_f," +
+    "tire_rr_kpa,tire_rr_psi,tire_rr_c,tire_rr_f" +
+    "\n"
 
 class DataDelegate:NSObject,ObservableObject {
-    @Published var latestRow: String = "timestamp,lat,lon,pos_acc_m,elevation_m,elevation_acc_m,speed_mps,speed_acc_mps,course_deg,course_acc_deg,tire_fl_kpa,tire_fl_c,tire_fr_kpa,tire_fr_c,tire_rl_kpa,tire_rl_c,tire_rr_kpa,tire_rr_c\n"
+    @Published var latestRow: String = csvHeader
     
-    @Published var screenText: String =
-        "..."
+    @Published var screenText: String = "..."
+    @Published var screenTire1Temp: String = "..."
+    @Published var screenTire1Pres: String = "..."
+    @Published var screenTire1Time: String = "..."
+    @Published var screenTire2Temp: String = "..."
+    @Published var screenTire2Pres: String = "..."
+    @Published var screenTire2Time: String = "..."
+    @Published var screenTire3Temp: String = "..."
+    @Published var screenTire3Pres: String = "..."
+    @Published var screenTire3Time: String = "..."
+    @Published var screenTire4Temp: String = "..."
+    @Published var screenTire4Pres: String = "..."
+    @Published var screenTire4Time: String = "..."
     
     let locationManager = CLLocationManager()
     var centralManager: CBCentralManager!
@@ -60,6 +81,9 @@ class DataDelegate:NSObject,ObservableObject {
     var haveLog = false
     var csvPath:URL = URL.init(fileURLWithPath: "/dev/null")
     var haveCsv = false
+    
+    var didStartCsv = false
+    var didGetTireData = false
     
 
     func log(_ message:String) {
@@ -110,8 +134,19 @@ class DataDelegate:NSObject,ObservableObject {
             }
         }
     }
+    func init_csv() {
+        do {
+            try csvHeader.write(to: self.csvPath, atomically: true, encoding: .utf8)
+        } catch {
+            self.log_error("Error writing to csv: \(self.csvPath.absoluteString)")
+        }
+    }
     func write_csv(_ csvLine:String) {
         if (haveCsv) {
+            if (!didStartCsv) {
+                init_csv()
+                didStartCsv = true
+            }
             do {
                 let fileHandle = try FileHandle(forWritingTo: csvPath)
                 let data = csvLine.data(using: String.Encoding.utf8, allowLossyConversion: true)!
@@ -144,12 +179,6 @@ class DataDelegate:NSObject,ObservableObject {
                 logPath = path!.appendingPathComponent(log_fn)
                 haveLog = true
             }
-
-            do {
-                try latestRow.write(to: self.csvPath, atomically: true, encoding: .utf8)
-            } catch {
-                self.log_error("Error writing to csv: \(self.csvPath.absoluteString)")
-            }
         }
 
         locationManager.requestWhenInUseAuthorization()
@@ -162,6 +191,9 @@ class DataDelegate:NSObject,ObservableObject {
         
         centralManager = CBCentralManager(delegate: self, queue: nil)
         
+        //Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { (t) in
+        //    self.newData()
+        //}
     }
     
     func newData() {
@@ -171,75 +203,146 @@ class DataDelegate:NSObject,ObservableObject {
         
         let lat = self.latestLoc.coordinate.latitude
         let lon = self.latestLoc.coordinate.longitude
-        let h_acc = self.latestLoc.horizontalAccuracy
+        let latlon_acc = self.latestLoc.horizontalAccuracy
         let elevation = self.latestLoc.altitude
         let elevation_acc = self.latestLoc.verticalAccuracy
-        let vel = self.latestLoc.speed
-        let vel_acc = self.latestLoc.speedAccuracy
-        let course = self.latestLoc.course
-        let course_acc = self.latestLoc.courseAccuracy
+        var vel = self.latestLoc.speed
+        var vel_acc = self.latestLoc.speedAccuracy
         
+        if (vel < 0) {
+            vel = 0
+        }
+        if (vel_acc < 0) {
+            vel_acc = 0
+        }
+
         // http://www.kylesconverter.com/speed-or-velocity/meters-per-second-to-miles-per-hour
+        
+        let c_latlon_acc_ft = latlon_acc * 3.280839895013123
+        let c_elevation_ft = elevation * 3.280839895013123
+        let c_elevation_ft_acc = elevation_acc * 3.280839895013123
+        let c_vel_mph = vel * 2.2369362920544025
+        let c_vel_mph_acc = vel_acc * 2.2369362920544025
+
         let f_lat = String(format: "%.4f", lat)
         let f_lon = String(format: "%.4f", lon)
-        let f_ele_ft = String(format: "%.1f", (elevation * 3.280839895013123))
-        let f_ele_acc = String(format: "%.1f", (elevation_acc * 3.280839895013123))
-        let f_vel_mph = String(format: "%.1f", (vel * 2.2369362920544025))
-        let f_vel_acc = String(format: "%.1f", (vel_acc * 2.2369362920544025))
-        let f_course = String(format: "%.1f", course)
         
-        let f_h_acc = String(format: "%d", Int(h_acc))
-        let f_course_acc = String(format: "%.1f", course_acc)
+        let f_ele_ft = String(format: "%.1f", c_elevation_ft)
+        let f_ele_ft_acc = String(format: "%.1f", c_elevation_ft_acc)
+        let f_vel_mph = String(format: "%.1f", c_vel_mph)
+        let f_vel_mph_acc = String(format: "%.1f", c_vel_mph_acc)
+        
+        // let f_latlon_acc = String(format: "%d", Int(latlon_acc))
+        let f_latlon_acc_ft = String(format: "%d", Int(c_latlon_acc_ft))
 
+        latestRow = "\(timeStr),\(lat),\(lon),\(latlon_acc),\(c_latlon_acc_ft),\(elevation),\(elevation_acc),\(c_elevation_ft),\(c_elevation_ft_acc),\(vel),\(vel_acc),\(c_vel_mph),\(c_vel_mph_acc)"
         
-        var vel_course_csv = ""
-        var vel_course_screen = ""
-        if (vel != -1.0) {
-            vel_course_screen = "\n\nSpeed: \(f_vel_mph) mph (+/- \(f_vel_acc) mph)\nCourse: \(f_course)º (+/- \(f_course_acc)º)"
-            
-            vel_course_csv = ",\(vel),\(vel_acc),\(course),\(course_acc)"
-        } else {
-            vel_course_csv = ",,,,"
-        }
+        screenText = "\(timeStr)\n\(f_lat), \(f_lon) (± \(f_latlon_acc_ft) ft)\n@ \(f_ele_ft) ft (± \(f_ele_ft_acc))\n\n\(f_vel_mph) mph (± \(f_vel_mph_acc))\n\n"
         
-        latestRow = "\(timeStr),\(lat),\(lon),\(h_acc),\(elevation),\(elevation_acc)\(vel_course_csv)"
-        screenText = "\(timeStr)\n\n\(f_lat), \(f_lon) (+/- \(f_h_acc) m)\nElevation: \(f_ele_ft) ft (+/- \(f_ele_acc) ft)\(vel_course_screen)\n\n"
-        
+        var haveTire = "0"
         for index in 0...3 {
-            var tpms_pressure = ""
-            var tpms_temperature = ""
-            var tpms_pressure_screen = ""
-            var tpms_temperature_screen = ""
-            var haveVal = false
-            if (tpms_pressure_kpa[index] >= 50.0) && (tpms_pressure_kpa[index] < 300.0) {
-                tpms_pressure = String(format: "%.4f", tpms_pressure_kpa[index])
-                tpms_pressure_screen = String(format: "%.4f psi", (tpms_pressure_kpa[index] * 0.14503773779))
-                haveVal = true
-            } else if (tpms_pressure_kpa_persist[index] >= 50.0) && (tpms_pressure_kpa_persist[index] < 300.0) {
-                tpms_pressure_screen = String(format: "(%.4f psi)", (tpms_pressure_kpa_persist[index] * 0.14503773779))
-                haveVal = true
+            let pressure_kpa = tpms_pressure_kpa[index]
+            let temperature_c = tpms_temperature_c[index]
+            if (pressure_kpa >= 50.0) && (pressure_kpa < 300.0) {
+                haveTire = "1"
             }
-            if (tpms_temperature_c[index] != 0.0) {
-                tpms_temperature = String(format: "%.4f", tpms_temperature_c[index])
-                tpms_temperature_screen = String(format: "%.4f ºF", ((tpms_temperature_c[index] * 9/5) + 32))
+            if (temperature_c != 0.0) {
+                haveTire = "1"
+            }
+        }
+        latestRow += ",\(haveTire)"
+
+        for index in 0...3 {
+//            let pressure_kpa = Double.random(in: 100.0 ..< 300.0)
+            let pressure_kpa = tpms_pressure_kpa[index]
+            let pressure_kpa_persist = tpms_pressure_kpa_persist[index]
+            let pressure_psi = (pressure_kpa * 0.14503773779)
+            let pressure_psi_persist = (pressure_kpa_persist * 0.14503773779)
+            let temperature_c = tpms_temperature_c[index]
+//            let temperature_c = Double.random(in: 15.0 ..< 40.0)
+            let temperature_c_persist = tpms_temperature_c_persist[index]
+            let temperature_f = ((temperature_c * 9/5) + 32)
+            let temperature_f_persist = ((temperature_c_persist * 9/5) + 32)
+
+            var f_pressure_kpa = ""
+            var f_pressure_psi = ""
+            var f_temperature_c = ""
+            var f_temperature_f = ""
+            
+            var f_pressure_psi_screen = ""
+            var f_temperature_f_screen = ""
+            
+            let formatPsi = NumberFormatter()
+            formatPsi.minimumFractionDigits = 2
+            formatPsi.maximumFractionDigits = 2
+            let formatFahrenheit = NumberFormatter()
+            formatFahrenheit.minimumFractionDigits = 1
+            formatFahrenheit.maximumFractionDigits = 1
+            let formatSeconds = NumberFormatter()
+            formatSeconds.minimumFractionDigits = 1
+            formatSeconds.maximumFractionDigits = 1
+            
+            var haveVal = false
+            // If we have a valid pressure
+            if (pressure_kpa >= 50.0) && (pressure_kpa < 300.0) {
+                f_pressure_kpa = String(format: "%.4f", pressure_kpa)
+                f_pressure_psi = String(format: "%.4f", pressure_psi)
+                f_pressure_psi_screen = String(format:"%.2f", pressure_psi).padding(toLength: 5, withPad: " ", startingAt: 0)
                 haveVal = true
-            } else if (tpms_temperature_c_persist[index] != 0.0) {
-                tpms_temperature_screen = String(format: "(%.4f ºF)", ((tpms_temperature_c_persist[index] * 9/5) + 32))
+            } else if (pressure_kpa_persist >= 50.0) && (pressure_kpa_persist < 300.0) {
+                f_pressure_psi_screen = String(format:"%.2f", pressure_psi_persist).padding(toLength: 5, withPad: " ", startingAt: 0)
                 haveVal = true
+            } else {
+                f_pressure_psi_screen = "--.--"
+            }
+            if (temperature_c != 0.0) {
+                f_temperature_c = String(format: "%.4f", temperature_c)
+                f_temperature_f = String(format: "%.4f", temperature_f)
+                f_temperature_f_screen = String(format:"%.1f", temperature_f).padding(toLength: 5, withPad: " ", startingAt: 0)
+                haveVal = true
+            } else if (temperature_c_persist != 0.0) {
+                f_temperature_f_screen = String(format:"%.1f", temperature_f_persist).padding(toLength: 5, withPad: " ", startingAt: 0)
+                haveVal = true
+            } else {
+                f_temperature_f_screen = "---.-"
             }
             let secSinceLastTick:Double = abs(tpms_last_tick[index].timeIntervalSinceNow)
-            var f_sec = ""
+//            let secSinceLastTick = Double.random(in: 0.0 ..< 1000.0)
+            var f_sec_screen = ""
             if (haveVal) {
-                f_sec = String(format: "       (%.1f ago)\n", secSinceLastTick)
+                f_sec_screen = String(format:"%.1f", secSinceLastTick).padding(toLength: 6, withPad: " ", startingAt: 0)
+            } else {
+                f_sec_screen = "----.-"
             }
-            latestRow += ",\(tpms_pressure),\(tpms_temperature)"
-            screenText += "TPMS\(index+1): \(tpms_pressure_screen)\n       \(tpms_temperature_screen)\n\(f_sec)"
+            
+            latestRow += ",\(f_pressure_kpa),\(f_pressure_psi),\(f_temperature_c),\(f_temperature_f)"
+            switch index {
+            case 0:
+                screenTire1Temp = f_temperature_f_screen
+                screenTire1Pres = f_pressure_psi_screen
+                screenTire1Time = f_sec_screen
+            case 1:
+                screenTire2Temp = f_temperature_f_screen
+                screenTire2Pres = f_pressure_psi_screen
+                screenTire2Time = f_sec_screen
+            case 2:
+                screenTire3Temp = f_temperature_f_screen
+                screenTire3Pres = f_pressure_psi_screen
+                screenTire3Time = f_sec_screen
+            case 3:
+                screenTire4Temp = f_temperature_f_screen
+                screenTire4Pres = f_pressure_psi_screen
+                screenTire4Time = f_sec_screen
+            default:
+                continue
+            }
         }
         latestRow += "\n"
         
         self.log_debug("\(self.latestRow)")
-        self.write_csv(latestRow)
-
+        if (didGetTireData) {
+            self.write_csv(latestRow)
+        }
 
         tpms_pressure_kpa = [0.0, 0.0, 0.0, 0.0]
         tpms_temperature_c = [0.0, 0.0, 0.0, 0.0]
@@ -310,7 +413,6 @@ extension DataDelegate: CBCentralManagerDelegate {
         // bytes 12,13,14,15 /100 -> temp in celsius
         let rawData:Data = advertisementData[CBAdvertisementDataManufacturerDataKey] as! Data
         let pressureRaw = rawData.subdata(in: Range(8...11))
-//        let pressureConv1 = UInt32(littleEndian: pressureRaw.withUnsafeBytes( { $0.pointee } ) )
         let pressureConv:Double = pressureRaw.withUnsafeBytes { Double($0.load(as: UInt32.self)) } / 1000.0
         let temperatureRaw = rawData.subdata(in: Range(12...15))
         let temperatureConv:Double = temperatureRaw.withUnsafeBytes { Double($0.load(as: UInt32.self)) } / 100.0
@@ -329,6 +431,7 @@ extension DataDelegate: CBCentralManagerDelegate {
         if (idx != -1) {
             let haveGoodTick = ((pressureConv != 0.0) || (temperatureConv != 0.0))
             if (haveGoodTick) {
+                didGetTireData = true
                 tpms_pressure_kpa[idx] = pressureConv
                 tpms_temperature_c[idx] = temperatureConv
                 if pressureConv != 0.0 {
