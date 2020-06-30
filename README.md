@@ -6,7 +6,7 @@ A tiny utility for _super cheap_ BLE tire pressure/temperature sensors available
 
 I wanted something to use alongside [RaceChrono](https://racechrono.com/) which I am currently using as a data logger with dash cam footage, particularly when [putting together video from autocross and similar events](https://www.youtube.com/playlist?list=PLRa9P6UDYxmqmdjMVgHUMYNy2yOgHtS_r) in [RaceRender](http://racerender.com/Products/index.html):
 
-[![Example video render of a car on an autocross track, with a cone obstacle course, and an overlay of car data including speed and RPM](https://github.com/mtigas/ios-ble-tpms-logger/blob/main/doc/screenshot-video.jpg?raw=true)](https://www.youtube.com/watch?v=oGNmTjFpWAI&list=PLRa9P6UDYxmqmdjMVgHUMYNy2yOgHtS_r&index=2)
+[![Example video render of a car on an autocross track, with a cone obstacle course, and an overlay of car data including speed and RPM](https://github.com/mtigas/iOS-BLE-Tire-Logger/blob/main/doc/screenshot-video.jpg?raw=true)](https://www.youtube.com/watch?v=oGNmTjFpWAI&list=PLRa9P6UDYxmqmdjMVgHUMYNy2yOgHtS_r&index=2)
 
 ---
 
@@ -18,7 +18,7 @@ Data is saved as a CSV to the app's `documentDirectory`, and is accessible in th
 
 See [doc/EXAMPLE-data-2020-06-28T103840.csv](doc/EXAMPLE-data-2020-06-28T103840.csv), which is an export from the autocross event in the above video.
 
-![Example CSV output](https://github.com/mtigas/ios-ble-tpms-logger/blob/main/doc/screenshot-csv.png?raw=true)
+![Example CSV output](https://github.com/mtigas/iOS-BLE-Tire-Logger/blob/main/doc/screenshot-csv.png?raw=true)
 
 
 ### Device details
@@ -29,7 +29,7 @@ See [doc/EXAMPLE-data-2020-06-28T103840.csv](doc/EXAMPLE-data-2020-06-28T103840.
 
 Using the free [nRF Connect app](https://www.nordicsemi.com/Software-and-tools/Development-Tools/nRF-Connect-for-mobile), raw information from the installed sensors can be seen here:
 
-![nRF Connect output, showing raw Bluetooth LE data coming from the TPMS sensors installed on my car. MAC addresses, the BLE Service UUID "0xFBB0" and the "manufacturer data" are seen here.](https://github.com/mtigas/ios-ble-tpms-logger/blob/main/doc/screenshot-nrfconnect.png?raw=true)
+![nRF Connect output, showing raw Bluetooth LE data coming from the TPMS sensors installed on my car. MAC addresses, the BLE Service UUID "0xFBB0" and the "manufacturer data" are seen here.](https://github.com/mtigas/iOS-BLE-Tire-Logger/blob/main/doc/screenshot-nrfconnect.png?raw=true)
 
 In the package that I received, each sensor advertises a name of `TPMS{N}_{MMMMMM}`, where `{N}` is a one-digit index (`1`, `2`, `3`, `4`) and `{MMMMMM}` is a six hex character MAC address suffix (i.e. `3063F3`); upon closer examination, it looks like `N` is the first digit of `MMMMMM`. In the packaging, these indexes and IDs are provided on an index card with bar codes to be scanned by the [manufacturer's app](https://apps.apple.com/us/app/tpmsii/id1436006976). Per the packaging, `1` goes to front-left, `2` goes to front-right, `3` to rear-left, and `4` to rear-right; however, this does not seem to be an important distinction, since having the IDs means that we can keep track of these by ourself.
 
